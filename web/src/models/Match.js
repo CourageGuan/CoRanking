@@ -18,9 +18,15 @@ class Match extends AV.Object {
     return match.save(match);
   }
 
-  static async getAll() {
+  static async getAll(descending = true) {
     const query = new AV.Query(Match.name);
-    return query.addDescending('time').find();
+    if (descending) query.addDescending('time');
+    return query.find();
+  }
+
+  static async delete(id) {
+    const match = AV.Object.createWithoutData(Match.name, id);
+    return match.destroy();
   }
 }
 

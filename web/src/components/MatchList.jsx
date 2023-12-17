@@ -20,12 +20,26 @@ function MatchList() {
   const [score0, setScore0] = useState("");
   const [team1, setTeam1] = useState("");
   const [score1, setScore1] = useState("");
+  const [lastAdded, setLastAdded] = useState(null);
   const [error, setError] = useState({
     team0: false,
     score0: false,
     team1: false,
     score1: false,
   });
+
+  const handleUndo = (match) => {
+    Match.delete(match.id).then(
+      () => {
+        setMatches(matches.filter((item) => item.id !== match.id));
+        setLastAdded(null);
+      },
+      (error) => {
+        alert("Error deleting match");
+        console.error(error);
+      }
+    );
+  };
 
   const handleScoreChange = (scoreSetter) => (e) => {
     let value = e.target.value;
@@ -62,6 +76,7 @@ function MatchList() {
         (match) => {
           console.debug(match);
           setMatches([match, ...matches]);
+          setLastAdded(match);
           setTeam0("");
           setScore0("");
           setTeam1("");
@@ -83,6 +98,7 @@ function MatchList() {
 
   // fetch matches list
   useEffect(() => {
+    setLastAdded(null); // clear undo button when page reload
     Match.getAll()
       .then((matches) => {
         setMatches(matches);
@@ -98,7 +114,7 @@ function MatchList() {
     Team.getAll()
       .then((teams) => {
         setTeams(teams);
-        // console.debug(teams);
+        console.debug(teams);
       })
       .catch((error) => {
         console.error(error);
@@ -112,7 +128,7 @@ function MatchList() {
           <Grid container spacing={2} alignItems="center">
             <Grid item>
               <FormControl style={{ minWidth: 120 }}>
-                <InputLabel>Home</InputLabel>
+                <InputLabel>Team 1</InputLabel>
                 <Select
                   value={team0}
                   onChange={(e) => setTeam0(e.target.value)}
@@ -120,7 +136,7 @@ function MatchList() {
                 >
                   {teams.map((team) => (
                     <MenuItem key={team.id} value={team.id}>
-                      {team.get('name')}
+                      {team.get("name")}
                     </MenuItem>
                   ))}
                 </Select>
@@ -157,7 +173,7 @@ function MatchList() {
 
             <Grid item>
               <FormControl style={{ minWidth: 120, marginLeft: 10 }}>
-                <InputLabel>Guest</InputLabel>
+                <InputLabel>Team 2</InputLabel>
                 <Select
                   value={team1}
                   onChange={(e) => setTeam1(e.target.value)}
@@ -165,7 +181,7 @@ function MatchList() {
                 >
                   {teams.map((team) => (
                     <MenuItem key={team.id} value={team.id}>
-                      {team.get('name')}
+                      {team.get("name")}
                     </MenuItem>
                   ))}
                 </Select>
@@ -184,15 +200,28 @@ function MatchList() {
           <ListItem key={index}>
             <Grid container spacing={2} alignItems="center">
               <Grid item style={{ minWidth: 120 }}>
-                {teams.find(team => team.id === item.get('team0').id)?.get('name')}
+                {teams
+                  .find((team) => team.id === item.get("team0").id)
+                  ?.get("name")}
               </Grid>
-              <Grid item>{item.get('score0')}</Grid>
+              <Grid item>{item.get("score0")}</Grid>
               <Grid item>
                 <span> - </span>
               </Grid>
-              <Grid item>{item.get('score1')}</Grid>
+              <Grid item>{item.get("score1")}</Grid>
               <Grid item style={{ minWidth: 120 }}>
-                {teams.find(team => team.id === item.get('team1').id)?.get('name')}
+                {teams
+                  .find((team) => team.id === item.get("team1").id)
+                  ?.get("name")}
+              </Grid>
+              <Grid item>
+                {index === 0 && item === lastAdded && (
+                  <Button
+                    onClick={() => handleUndo(item)}
+                  >
+                    Undo
+                  </Button>
+                )}
               </Grid>
             </Grid>
           </ListItem>
