@@ -2,6 +2,8 @@ import AV from "./leancloud";
 import Team from "./Team";
 
 class Match extends AV.Object {
+
+  static name = "Match";
   static {
     AV.Object.register(Match);
   }

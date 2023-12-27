@@ -1,6 +1,8 @@
 import AV from "./leancloud";
 
 class Team extends AV.Object {
+
+  static name = "Team";
   static {
     AV.Object.register(Team);
   }
