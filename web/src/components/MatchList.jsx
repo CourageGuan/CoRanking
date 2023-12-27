@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   List,
   ListItem,
@@ -11,11 +11,15 @@ import {
   Grid,
 } from "@mui/material";
 import Match from "../models/Match";
-import Team from "../models/Team";
+import PropTypes from "prop-types";
 
-function MatchList() {
-  const [matches, setMatches] = useState([]);
-  const [teams, setTeams] = useState([]);
+MatchList.propTypes = {
+  teams: PropTypes.array.isRequired,
+  matches: PropTypes.array.isRequired,
+  setMatches: PropTypes.func.isRequired,
+};
+
+function MatchList({ teams = [], matches = [], setMatches }) {
   const [team0, setTeam0] = useState("");
   const [score0, setScore0] = useState("");
   const [team1, setTeam1] = useState("");
@@ -96,31 +100,6 @@ function MatchList() {
     }
   };
 
-  // fetch matches list
-  useEffect(() => {
-    setLastAdded(null); // clear undo button when page reload
-    Match.getAll()
-      .then((matches) => {
-        setMatches(matches);
-        console.debug(matches);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  }, []);
-
-  // fetch teams list
-  useEffect(() => {
-    Team.getAll()
-      .then((teams) => {
-        setTeams(teams);
-        console.debug(teams);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  }, []);
-
   return (
     <>
       <List>
@@ -189,7 +168,12 @@ function MatchList() {
             </Grid>
 
             <Grid item>
-              <Button onClick={handleAdd} style={{ marginLeft: 10 }}>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleAdd}
+                style={{ marginLeft: 10 }}
+              >
                 Add
               </Button>
             </Grid>
@@ -217,6 +201,8 @@ function MatchList() {
               <Grid item>
                 {index === 0 && item === lastAdded && (
                   <Button
+                    variant="outlined"
+                    color="primary"
                     onClick={() => handleUndo(item)}
                   >
                     Undo
