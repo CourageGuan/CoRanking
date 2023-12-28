@@ -36,7 +36,7 @@ function ScoreBoard({ teams = [], matches = [] }) {
     });
     console.debug(_players);
 
-    matches.forEach((match) => {
+    matches.toReversed().forEach((match) => {
       const team0 = _players[match.get("team0").id];
       const team1 = _players[match.get("team1").id];
       if (team0 === undefined || team1 === undefined) {
